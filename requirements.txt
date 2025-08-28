@@ -1,6 +1,6 @@
 ipykernel
 setuptools<81  # silence the warning "pkg_resources is deprecated as an API..."
-gymnasium[classic-control]
+gymnasium[classic-control,other]
 stable_baselines3
 opencv-python
 imageio[ffmpeg]
