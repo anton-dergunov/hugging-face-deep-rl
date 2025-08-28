@@ -1,0 +1,4 @@
+ipykernel
+gymnasium[classic-control]
+stable_baselines3
+opencv-python
