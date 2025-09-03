@@ -1,7 +1,7 @@
 # Core RL and environment
 stable-baselines3
 gymnasium[classic-control,other]
-huggingface_sb3
+huggingface_hub
 tensorboard
 
 # Video and image processing
