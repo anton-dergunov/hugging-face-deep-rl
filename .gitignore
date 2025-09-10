@@ -2,3 +2,5 @@
 videos/
 models/
 logs/
+requirements.txt
+*.pyc
