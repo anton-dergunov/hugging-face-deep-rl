@@ -1,6 +1,9 @@
+# TODO Improve structure of these requirements below
+
 # Core RL and environment
+swig
+gymnasium[classic-control,box2d,other]
 stable-baselines3
-gymnasium[classic-control,other]
 huggingface_hub
 tensorboard
 

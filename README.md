@@ -14,7 +14,7 @@ python -m ipykernel install --user --name=.venv --display-name "Python (.venv wi
 uv pip install pip
 ```
 
-No good support for `pygame` with Python 3.13 yet on MacOS.
+Python 3.12 is recommended, because at the moment there is no good support for `pygame` with Python 3.13 yet on MacOS.
 
 ```bash
 uv pip install -r requirements.txt
