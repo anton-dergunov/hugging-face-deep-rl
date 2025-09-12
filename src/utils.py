@@ -10,25 +10,19 @@ import numpy as np
 from functools import wraps
 
 # TODO Clean up this list of imports
-import gymnasium as gym
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import VecMonitor
-from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.results_plotter import plot_results
 from stable_baselines3.common import results_plotter
 from huggingface_hub import HfApi, create_repo, notebook_login, hf_hub_download
 import cv2
 from IPython.display import Video
-import matplotlib.pyplot as plt
 from pathlib import Path
 import hashlib
 import imageio
-import os
 import json
 import tempfile
-import warnings
 
 
 def setup_ignore_warnings():
