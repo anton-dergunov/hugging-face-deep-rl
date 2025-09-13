@@ -1,6 +1,6 @@
 .DS_Store
-videos/
-models/
-logs/
+notebooks/videos/
+notebooks/models/
+notebooks/logs/
 requirements.txt
 *.pyc
