@@ -28,6 +28,12 @@ class HuggingFaceModelHub:
     def __init__(self):
         self.api = HfApi()
 
+    def hello(self):
+        print("hello2")
+
+    def hello2(self):
+        print("hello2-")
+
     # ------------------ Authentication ------------------
     def login_if_needed(self, interactive: bool = True) -> None:
         """Ensure Hugging Face credentials are available.
@@ -38,7 +44,7 @@ class HuggingFaceModelHub:
         """
         try:
             whoami()
-            print("✅ Hugging Face credentials already available.")
+            print("✅ Hugging Face credentials already available. Hello")
         except Exception:
             if interactive:
                 try:

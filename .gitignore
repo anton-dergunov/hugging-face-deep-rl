@@ -4,3 +4,4 @@ notebooks/models/
 notebooks/logs/
 requirements.txt
 *.pyc
+src/rlcourse.egg-info/
