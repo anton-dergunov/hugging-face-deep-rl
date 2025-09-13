@@ -6,6 +6,9 @@ Class: HuggingFaceModelHub
 - upload_model_file(...)
 - download_model_file(...)
 - delete_repo(...)
+
+TODO Make sure that the format of Model Cards is correct
+https://huggingface.co/docs/hub/en/model-cards
 """
 
 import json
@@ -74,6 +77,7 @@ class HuggingFaceModelHub:
             Name to use inside the repo. If None, basename(file) is used.
         model_name, library, algo, env_id: Optional[str]
             Metadata fields written to metadata.json.
+            List of libraries: https://huggingface.co/docs/hub/en/models-libraries
         metrics: Optional[dict]
             Dictionary of metric name -> value to include in metadata/readme.
         video_file: Optional[str | Path]
