@@ -15,3 +15,5 @@ imageio[ffmpeg]
 ipykernel
 jupyter-client
 ipywidgets
+
+pytest
