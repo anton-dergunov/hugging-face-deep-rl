@@ -1,37 +1,15 @@
+import os
+import cv2
+import imageio
+from functools import wraps
+
+import numpy as np
 import gymnasium as gym
 from gymnasium.spaces import Box, Discrete, MultiDiscrete, MultiBinary, Tuple, Dict
 from stable_baselines3.common.vec_env import VecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import matplotlib.pyplot as plt
-import os
-import warnings
-import numpy as np
-from functools import wraps
-
-# TODO Clean up this list of imports
-from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import VecMonitor
-from stable_baselines3.common.results_plotter import plot_results
-from stable_baselines3.common import results_plotter
-from huggingface_hub import HfApi, create_repo, notebook_login, hf_hub_download
-import cv2
-from IPython.display import Video
-from pathlib import Path
-import hashlib
-import imageio
-import json
-import tempfile
-
-
-def setup_ignore_warnings():
-    # This filter handles the "pkg_resources is deprecated" warning from Pygame
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module='pygame')
-    warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
-
-    # This filter handles all the "Deprecated call to `pkg_resources.declare_namespace`" warnings
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module='pkg_resources')
 
 
 def with_dummy_video_driver(func):

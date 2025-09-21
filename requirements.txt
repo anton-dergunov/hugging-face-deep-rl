@@ -1,8 +1,6 @@
-# TODO Improve structure of these requirements below
-
 # Core RL and environment
 swig
-gymnasium[classic-control,box2d,other]
+gymnasium[classic-control,other,box2d]
 stable-baselines3
 huggingface_hub
 tensorboard
@@ -16,4 +14,5 @@ ipykernel
 jupyter-client
 ipywidgets
 
+# Dev & testing
 pytest
