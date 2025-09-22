@@ -19,3 +19,8 @@ Python 3.12 is recommended, because at the moment there is no good support for `
 ```bash
 uv pip install -r requirements.txt
 ```
+
+## Telegram Notifications
+
+TODO Also describe how to create Telegram bot.
+
