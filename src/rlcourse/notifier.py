@@ -20,6 +20,9 @@ Example Usage:
         ...
 - Sending Telegram message manually
     send_telegram_message(message)
+
+TODO Describe Bot setup
+TODO Also add start/finish time
 """
 
 import os
