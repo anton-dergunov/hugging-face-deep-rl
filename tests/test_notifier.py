@@ -2,27 +2,29 @@
 Unit tests for notifier.py that avoid hitting the real Telegram API by mocking requests.
 """
 
-import os
 import json
-import tempfile
-import builtins
-import requests
 from unittest import mock
 
 from rlcourse import notifier
 
 
-def test_format_duration():
-    assert notifier._format_duration(0.001)  # returns ms
-    assert notifier._format_duration(0.5).endswith("ms") or notifier._format_duration(0.5).endswith("s")
-    assert "h" in notifier._format_duration(3600)
+def test_format_duration_exact():
+    assert notifier._format_duration(0.0005) == "0.5ms"
+    assert notifier._format_duration(0.5) == "500.0ms"
+    assert notifier._format_duration(2) == "2s"
+    assert notifier._format_duration(65) == "1m 5s"
+    assert notifier._format_duration(3661.2) == "1h 1m 1.2s"
 
 
-def test_build_message_contains_job_and_env():
-    msg = notifier._build_message("my_job", 1.23, True, env_desc="TestEnv", extra_text="hey")
-    assert "my_job" in msg
-    assert "TestEnv" in msg
-    assert "hey" in msg
+def test_build_message_contains_expected_fields():
+    msg = notifier._build_message(
+        "train_model", 12.3, True, env_desc="CI", source="script.py", extra_text="extra"
+    )
+    assert "train_model" in msg
+    assert "12.3" not in msg  # should be formatted, not raw
+    assert "Env: <code>CI</code>" in msg
+    assert "script.py" in msg
+    assert "extra" in msg
 
 
 @mock.patch("rlcourse.notifier.requests.post")
