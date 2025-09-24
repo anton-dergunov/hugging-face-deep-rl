@@ -3,6 +3,8 @@ Unit tests for notifier.py that avoid hitting the real Telegram API by mocking r
 """
 
 import json
+import types
+import sys
 from unittest import mock
 
 from rlcourse import notifier
@@ -18,13 +20,39 @@ def test_format_duration_exact():
 
 def test_build_message_contains_expected_fields():
     msg = notifier._build_message(
-        "train_model", 12.3, True, env_desc="CI", source="script.py", extra_text="extra"
+        "train_model", 120.3, True, env_desc="CI", source="script.py", extra_text="extra"
     )
     assert "train_model" in msg
-    assert "12.3" not in msg  # should be formatted, not raw
+    assert "120.3" not in msg  # should be formatted, not raw
+    assert "2m 0.3s" in msg
     assert "Env: <code>CI</code>" in msg
     assert "script.py" in msg
     assert "extra" in msg
+
+
+def test_get_notebook_or_script_name_notebook(monkeypatch):
+    # Simulate ipynbname returning a notebook path
+    fake_ipynb = types.SimpleNamespace(path=lambda: types.SimpleNamespace(name="test_nb.ipynb"))
+    monkeypatch.setitem(sys.modules, "ipynbname", fake_ipynb)
+    assert notifier.get_notebook_or_script_name() == "test_nb.ipynb"
+
+
+def test_get_notebook_or_script_name_script(monkeypatch):
+    # Force ipynbname import to fail
+    monkeypatch.setitem(sys.modules, "ipynbname", None)
+    # Simulate inspect.stack returning a frame with a filename
+    monkeypatch.setattr(notifier.inspect, "stack", lambda: [types.SimpleNamespace(filename="script.py")])
+    assert notifier.get_notebook_or_script_name() == "script.py"
+
+
+def test_get_notebook_or_script_name_unknown(monkeypatch):
+    # Break ipynbname
+    monkeypatch.setitem(sys.modules, "ipynbname", None)
+    # Break inspect.stack
+    monkeypatch.setattr(notifier.inspect, "stack", lambda: [types.SimpleNamespace(filename="<stdin>")])
+    # Simulate empty sys.argv
+    monkeypatch.setattr(notifier.sys, "argv", [])
+    assert notifier.get_notebook_or_script_name() is None
 
 
 @mock.patch("rlcourse.notifier.requests.post")
@@ -81,3 +109,19 @@ def test_notify_context_manager_failure(monkeypatch):
         pass
     assert "t_err" in sent['text']
     assert ("Error" in sent['text'] or "❌" in sent['text'])
+
+
+def test_min_duration_filter(monkeypatch):
+    sent_messages = []
+
+    def fake_send(msg, token, chat_id):
+        sent_messages.append(msg)
+        return {"ok": True}
+
+    monkeypatch.setattr(notifier, "send_telegram_message", fake_send)
+
+    # Very short job (< min_duration=1.0s)
+    with notifier.Notify("TooFastJob", "dummy", "dummy", min_duration=1.0):
+        pass
+
+    assert sent_messages == [], "No messages should be sent for too short jobs"
