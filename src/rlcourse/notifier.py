@@ -21,8 +21,14 @@ Example Usage:
 - Sending Telegram message manually
     send_telegram_message(message)
 
-TODO Describe Bot setup
-TODO Also add start/finish time
+To setup Telegram bot:
+1. Search for the official @BotFather in Telegram.
+2. Send it the /newbot command to start the creation process.
+   This will provide the API token.
+3. Save this token:
+   If running locally, set it as env var TG_BOT_TOKEN (or put in shell startup script).
+   If running in Google Colab or Kaggle, put it as TG_BOT_TOKEN secret.
+4. Initiate the bot in your Telegram by sending a message.
 """
 
 import os
@@ -30,7 +36,6 @@ import sys
 import time
 import json
 import platform
-import traceback
 import socket
 import getpass
 from contextlib import ContextDecorator
@@ -221,7 +226,6 @@ def get_or_fetch_chat_id(bot_token: str,
             if cid:
                 # cache and return
                 cache["chat_id"] = int(cid)
-                cache["bot_token_sample"] = str(bot_token)[:8]  # not storing full token
                 _write_cache(cache, cache_file)
                 return int(cid)
 
@@ -298,8 +302,9 @@ def _build_message(job_name: str,
     Build a nicely formatted HTML message for Telegram.
     """
     status_emoji = "✅" if success else "❌"
+    status_text = "Succeeded" if success else "Failed"
     lines = []
-    lines.append(f"<b>{status_emoji} Job: {job_name}</b>")
+    lines.append(f"<b>{status_emoji} {status_text}: {job_name}</b>")
     lines.append(f"Elapsed: {_format_duration(elapsed)}")
     lines.append(f"Env: <code>{env_desc}</code>")
     if source:
@@ -396,24 +401,3 @@ class Notify(ContextDecorator):
             print("Failed to send telegram notification:", e)
         # do not suppress exceptions
         return False
-
-
-# -----------------------------
-# Manual integration test (not CI)
-# -----------------------------
-
-def send_and_verify_integration(
-    bot_token: str, chat_id: str | None = None, test_message: str = "🔔 Test message"
-):
-    """
-    Send a test message and verify it appears in getUpdates.
-    For manual use only (not suitable for CI).
-    """
-    resp = send_telegram_message(test_message, bot_token, chat_id)
-
-    # Fetch recent updates
-    url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
-    updates = requests.get(url, timeout=10).json()
-    texts = [r["message"]["text"] for r in updates.get("result", []) if "message" in r]
-
-    return test_message in texts

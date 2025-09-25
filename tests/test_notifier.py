@@ -23,6 +23,7 @@ def test_build_message_contains_expected_fields():
         "train_model", 120.3, True, env_desc="CI", source="script.py", extra_text="extra"
     )
     assert "train_model" in msg
+    assert "Succeeded" in msg
     assert "120.3" not in msg  # should be formatted, not raw
     assert "2m 0.3s" in msg
     assert "Env: <code>CI</code>" in msg
@@ -80,45 +81,69 @@ def test_get_or_fetch_chat_id_and_send(mock_get, mock_post, tmp_path):
     assert resp.get("ok") is True
 
 
-def test_notify_context_manager_success(monkeypatch, tmp_path):
+def monkey_patch_send_messages(monkeypatch):
+    sent_messages = []
+
     # stub send_telegram_message so we don't call network
-    sent = {}
-    def fake_send(text, bot_token=None, chat_id=None, parse_mode="HTML"):
-        sent['text'] = text
+    def fake_send(*args, **kwargs):
+        text = kwargs.get("text", args[0] if args else None)
+        sent_messages.append(text)
         return {"ok": True}
+
     monkeypatch.setattr(notifier, "send_telegram_message", fake_send)
+    return sent_messages
+
+
+def test_notify_context_manager_success(monkeypatch):
+    sent_messages = monkey_patch_send_messages(monkeypatch)
 
     # use the context manager
     with notifier.Notify(job_name="t1", bot_token="DUMMY", min_duration=0.0, extra_text="details"):
         # quick operation
         x = 1+1
-    assert "Job: t1" in sent['text']
+    assert "Succeeded: t1" in sent_messages[0]
 
 
 def test_notify_context_manager_failure(monkeypatch):
-    sent = {}
-    def fake_send(text, bot_token=None, chat_id=None, parse_mode="HTML"):
-        sent['text'] = text
-        return {"ok": True}
-    monkeypatch.setattr(notifier, "send_telegram_message", fake_send)
+    sent_messages = monkey_patch_send_messages(monkeypatch)
 
     try:
         with notifier.Notify(job_name="t_err", bot_token="DUMMY", min_duration=0.0):
             raise RuntimeError("boom")
     except RuntimeError:
         pass
-    assert "t_err" in sent['text']
-    assert ("Error" in sent['text'] or "❌" in sent['text'])
+    assert "Failed: t_err" in sent_messages[0]
+    assert "Error" in sent_messages[0]
+
+
+def test_notify_decorator_success(monkeypatch, tmp_path):
+    sent_messages = monkey_patch_send_messages(monkeypatch)
+
+    # use the decorator
+    @notifier.Notify(job_name="t1", bot_token="DUMMY", min_duration=0.0, extra_text="details")
+    def job():
+        # quick operation
+        x = 1+1
+    job()
+    assert "Succeeded: t1" in sent_messages[0]
+
+
+def test_notify_decorator_failure(monkeypatch):
+    sent_messages = monkey_patch_send_messages(monkeypatch)
+
+    @notifier.Notify(job_name="t_err", bot_token="DUMMY", min_duration=0.0)
+    def job():
+        raise RuntimeError("boom")
+    try:
+        job()
+    except RuntimeError:
+        pass
+    assert "Failed: t_err" in sent_messages[0]
+    assert "Error" in sent_messages[0]
 
 
 def test_min_duration_filter(monkeypatch):
-    sent_messages = []
-
-    def fake_send(msg, token, chat_id):
-        sent_messages.append(msg)
-        return {"ok": True}
-
-    monkeypatch.setattr(notifier, "send_telegram_message", fake_send)
+    sent_messages = monkey_patch_send_messages(monkeypatch)
 
     # Very short job (< min_duration=1.0s)
     with notifier.Notify("TooFastJob", "dummy", "dummy", min_duration=1.0):
