@@ -1,8 +1,9 @@
 # Deep Reinforcement Learning Course from Hugging Face
+
 [![Tests](https://github.com/anton-dergunov/hugging-face-deep-rl/actions/workflows/tests.yaml/badge.svg)](https://github.com/anton-dergunov/hugging-face-deep-rl/actions/workflows/tests.yaml)
 
-https://huggingface.co/learn/deep-rl-course/en/unit0/introduction
-https://simoninithomas.github.io/deep-rl-course/
+- https://huggingface.co/learn/deep-rl-course/en/unit0/introduction
+- https://simoninithomas.github.io/deep-rl-course/
 
 Instructions:
 

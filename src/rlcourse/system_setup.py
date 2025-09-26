@@ -43,8 +43,8 @@ def setup_ignore_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
 
     # "Jupyter is migrating its paths to use standard platformdirs" warnings
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_client.connect")
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_core.paths")
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module=r"jupyter_client.*")
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module=r"jupyter_core.*")
 
     # Optional: silence FutureWarnings too if they pop up often
     # warnings.filterwarnings("ignore", category=FutureWarning)
