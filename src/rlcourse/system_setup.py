@@ -33,12 +33,21 @@ def ensure_swig():
 
 
 def setup_ignore_warnings():
-    # This filter handles the "pkg_resources is deprecated" warning from Pygame
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module='pygame')
+    """Silence noisy deprecation/user warnings from dependencies."""
+
+    # "pkg_resources is deprecated" warning from Pygame
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module="pygame")
     warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
 
-    # This filter handles all the "Deprecated call to `pkg_resources.declare_namespace`" warnings
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module='pkg_resources')
+    # "Deprecated call to `pkg_resources.declare_namespace`" warnings
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
+
+    # "Jupyter is migrating its paths to use standard platformdirs" warnings
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_client.connect")
+    warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_core.paths")
+
+    # Optional: silence FutureWarnings too if they pop up often
+    # warnings.filterwarnings("ignore", category=FutureWarning)
 
     print("🔇 Warnings filtered")
 
