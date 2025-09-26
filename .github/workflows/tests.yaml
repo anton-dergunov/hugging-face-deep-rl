@@ -43,6 +43,7 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Run integration tests
+        if: ${{ secrets.HF_TOKEN != '' }}
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           PYTHONPATH: ./src
