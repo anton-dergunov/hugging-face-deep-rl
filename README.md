@@ -3,7 +3,7 @@
 https://huggingface.co/learn/deep-rl-course/en/unit0/introduction
 https://simoninithomas.github.io/deep-rl-course/
 
-[![Tests](https://github.com/<owner>/<repo>/actions/workflows/tests.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/tests.yml)
+[![Tests](https://github.com/anton-dergunov/hugging-face-deep-rl/actions/workflows/tests.yml/badge.svg)](https://github.com/anton-dergunov/hugging-face-deep-rl/actions/workflows/tests.yml)
 
 Instructions:
 
