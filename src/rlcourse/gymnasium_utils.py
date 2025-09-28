@@ -29,8 +29,8 @@ def with_dummy_video_driver(func):
 
 
 @with_dummy_video_driver
-def show_environment(env_id, steps=20):
-    env = gym.make(env_id, render_mode="rgb_array")
+def show_environment(env, steps=20):
+    """Displays the environment to get an idea about it"""
     env.reset()
 
     # Progress the environment for several steps so that the image is more interesting
