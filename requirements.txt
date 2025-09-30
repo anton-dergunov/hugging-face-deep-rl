@@ -1,6 +1,6 @@
 # Core RL and environment
 swig
-gymnasium[classic-control,other,box2d]
+gymnasium[classic-control,box2d,other]
 stable-baselines3
 huggingface_hub
 tensorboard
@@ -14,6 +14,7 @@ ipykernel
 jupyter-client
 ipywidgets
 ipynbname
+tqdm
 
 # Dev & testing
 pytest
