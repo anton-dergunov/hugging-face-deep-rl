@@ -18,6 +18,14 @@ import tempfile
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
 
+# HF progress bars are not always correctly displayed in VS Code Jupyter Notebooks
+# when reopening them, so disable them.
+import os
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+# Optional double-safety
+from huggingface_hub import utils as hf_utils
+hf_utils.disable_progress_bars()
+
 from huggingface_hub import HfApi, whoami, notebook_login, login, create_repo, hf_hub_download, delete_repo
 
 
