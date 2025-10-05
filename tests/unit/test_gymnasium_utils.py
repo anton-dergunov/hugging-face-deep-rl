@@ -1,5 +1,7 @@
 import os
+import pytest
 import numpy as np
+
 import gymnasium as gym
 
 from rlcourse import gymnasium_utils
@@ -82,12 +84,32 @@ class DummyModel:
 
 
 def test_evaluate_model_with_dummy_model():
-    env_id = "CartPole-v1"
+    model = DummyModel()
+    result = gymnasium_utils.evaluate_model(model, "CartPole-v1", n_eval_episodes=1)
+    assert set(result.keys()) == {"mean_reward", "std_reward", "n_eval_episodes", "seed"}
+    assert result["n_eval_episodes"] == 1
+
+
+def test_stable_evaluate_confidence_interval(monkeypatch):
+    """Test that stable_evaluate computes confidence intervals correctly."""
+
+    # Return controlled results for three seeds
+    fake_results = [
+        {"mean_reward": 200.0, "std_reward": 30.0, "n_eval_episodes": 30, "seed": 0},
+        {"mean_reward": 210.0, "std_reward": 40.0, "n_eval_episodes": 30, "seed": 1},
+        {"mean_reward": 190.0, "std_reward": 20.0, "n_eval_episodes": 30, "seed": 2},
+    ]
+
+    monkeypatch.setattr(gymnasium_utils, "evaluate_model", lambda *args, **kwargs: fake_results.pop(0))
 
     model = DummyModel()
-    result = gymnasium_utils.evaluate_model(model, env_id, n_eval_episodes=1)
-    assert set(result.keys()) == {"mean_reward", "std_reward", "n_eval_episodes"}
-    assert result["n_eval_episodes"] == 1
+    result = gymnasium_utils.stable_evaluate(model, "CartPole-v1", seeds=(0,1,2), n_eval_episodes=30)
+
+    assert pytest.approx(result["mean_reward"], rel=1e-6) == 200.0
+    assert pytest.approx(result["std_reward"], rel=1e-2) == 31.091
+    assert pytest.approx(result["ci_low"], rel=1e-2) == 193.576
+    assert pytest.approx(result["ci_high"], rel=1e-2) == 206.424
+    assert result["n_total"] == 90
 
 
 # -------------------------------
