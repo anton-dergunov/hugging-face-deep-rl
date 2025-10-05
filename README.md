@@ -28,8 +28,8 @@ TODO Also describe how to create Telegram bot.
 
 ## Notebooks
 
-- [CartPole with PPO](blob/main/notebooks/00_cartpole.ipynb)
-- [Lunar Lander with PPO](blob/main/notebooks/01_lunar_lander.ipynb)
-- [Frozen Lake with Q-Learning](blob/main/notebooks/02_frozen_lake_q_learning.ipynb)
+- [CartPole with PPO](notebooks/00_cartpole.ipynb)
+- [Lunar Lander with PPO](notebooks/01_lunar_lander.ipynb)
+- [Frozen Lake with Q-Learning](notebooks/02_frozen_lake_q_learning.ipynb)
 
 TODO Describe these notebooks.
