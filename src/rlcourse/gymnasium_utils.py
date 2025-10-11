@@ -160,11 +160,11 @@ def make_subproc_env(env_id, n_proc, seed, log_dir=None):
     return SubprocVecEnv([make_env(env_id, i, seed=seed, log_dir=log_dir) for i in range(n_proc)])
 
 
-def evaluate_model(model, env_id, n_eval_episodes=50, seed=42):
+def evaluate_model(model, env_id, n_eval_episodes=50, seed=42, env_kwargs={}):
     """
     Evaluate the model for a given seed and return summary statistics.
     """
-    env = Monitor(gym.make(env_id))
+    env = Monitor(gym.make(env_id, **env_kwargs))
     env.reset(seed=seed)
     mean_reward, std_reward = evaluate_policy(
         model, env, n_eval_episodes=n_eval_episodes, deterministic=True)
@@ -177,12 +177,12 @@ def evaluate_model(model, env_id, n_eval_episodes=50, seed=42):
     }
 
 
-def stable_evaluate(model, env_id, seeds=(0, 42, 99), n_eval_episodes=30):
+def stable_evaluate(model, env_id, seeds=(0, 42, 99), n_eval_episodes=30, env_kwargs={}):
     """
     Evaluate the model across multiple seeds and compute a 95% confidence interval
     for the mean reward estimate.
     """
-    results = [evaluate_model(model, env_id, n_eval_episodes, s) for s in seeds]
+    results = [evaluate_model(model, env_id, n_eval_episodes, s, env_kwargs) for s in seeds]
 
     mean_rewards = np.array([r["mean_reward"] for r in results])
     std_rewards = np.array([r["std_reward"] for r in results])
@@ -214,9 +214,9 @@ def stable_evaluate(model, env_id, seeds=(0, 42, 99), n_eval_episodes=30):
 
 
 @with_dummy_video_driver
-def record_agent_video(model, env_id, video_path, steps=1000):
+def record_agent_video(model, env_id, video_path, steps=1000, env_kwargs={}):
     # Create env with video recording enabled
-    env = gym.make(env_id, render_mode="rgb_array")
+    env = gym.make(env_id, **env_kwargs, render_mode="rgb_array")
     
     try:
         frames = []
