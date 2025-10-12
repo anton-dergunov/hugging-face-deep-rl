@@ -213,6 +213,24 @@ def stable_evaluate(model, env_id, seeds=(0, 42, 99), n_eval_episodes=30, env_kw
     }
 
 
+def _annotate_frame(frame, episode, step, total_reward, reward_delta):
+    """Return annotated frame copy."""
+    out = frame.copy()
+    cv2.rectangle(out, (5, 5), (155, 105), (255, 255, 255), -1)
+    alpha = 0.5
+    out = cv2.addWeighted(out, 1 - alpha, frame, alpha, 0)  # subtle transparent box
+    cv2.putText(out, f"Ep: {episode}", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
+    cv2.putText(out, f"Step: {step}", (10, 45), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
+    cv2.putText(out, f"Reward: {total_reward:.2f}", (10, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
+    cv2.putText(out, f"Delta: {reward_delta:.2f}", (10, 85), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
+    return out
+
+
+def _render_and_annotate(env, episode, step, total_reward, reward_delta):
+    frame = env.render()
+    return _annotate_frame(frame, episode, step, total_reward, reward_delta)
+
+
 @with_dummy_video_driver
 def record_agent_video(model, env_id, video_path, steps=1000, env_kwargs={}):
     # Create env with video recording enabled
@@ -224,37 +242,27 @@ def record_agent_video(model, env_id, video_path, steps=1000, env_kwargs={}):
         episode, step = 0, 0
         total_reward = 0
 
+        # Record initial frame right after reset
+        frames.append(_render_and_annotate(env, episode, step, total_reward, 0.0))
+
         for _ in range(steps):
             action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(action)
             total_reward += reward
-            
-            # Render the frame from the environment
-            frame = env.render()
-
-            # --- Overlay text (small, anti-aliased) ---
-            overlay = frame.copy()
-            cv2.rectangle(overlay, (5, 5), (155, 105), (255, 255, 255), -1)
-            alpha = 0.5  # 50% opacity
-            frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
-            cv2.putText(frame, f"Ep: {episode}", (10, 25),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
-            cv2.putText(frame, f"Step: {step}", (10, 45),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
-            cv2.putText(frame, f"Reward: {total_reward:.2f}", (10, 65),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
-            cv2.putText(frame, f"Delta: {reward:.2f}", (10, 85),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
-
-            frames.append(frame)
             step += 1
+                    
+            # Render the frame from the environment
+            frames.append(_render_and_annotate(env, episode, step, total_reward, reward))
 
             if terminated or truncated:
                 episode += 1
                 step = 0
                 total_reward = 0
                 obs, info = env.reset()
-        
+
+                # Immediately record new episode's initial frame
+                frames.append(_render_and_annotate(env, episode, step, total_reward, 0.0))
+
         # Save the collected frames to a single video file
         os.makedirs(os.path.dirname(video_path), exist_ok=True)
         fps = env.metadata.get("render_fps", 30)
