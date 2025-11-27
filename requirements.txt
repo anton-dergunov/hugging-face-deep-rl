@@ -2,6 +2,7 @@
 swig
 gymnasium[classic-control,box2d,other]
 stable-baselines3
+rl_zoo3
 huggingface_hub
 tensorboard
 
